@@ -1,0 +1,24 @@
+{
+  "name": "web-scraping-pbp",
+  "version": "1.0.0",
+  "description": "Gives you information about a product from a specific pages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoaoPortas/WebScrapingAPI-PBP.git"
+  },
+  "author": "Joao Portas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JoaoPortas/WebScrapingAPI-PBP/issues"
+  },
+  "homepage": "https://github.com/JoaoPortas/WebScrapingAPI-PBP#readme",
+  "dependencies": {
+    "axios": "^0.21.3",
+    "express": "^4.17.1",
+    "puppeteer": "^10.2.0"
+  }
+}
