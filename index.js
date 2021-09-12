@@ -7,8 +7,8 @@ const port = 9000;
 
 //Scraping Sources Imports
 const legrand = require('./web_scraping_sources/legrand');
-/*const hager = require('./web_scraping_sources/hager');
-const jsl = require('./web_scraping_sources/jsl');*/
+const hager = require('./web_scraping_sources/hager');
+/*const jsl = require('./web_scraping_sources/jsl');*/
 
 app.get('/:source/:ref', async (req, res) => {
   var source = req.params.source;
@@ -18,13 +18,11 @@ app.get('/:source/:ref', async (req, res) => {
   try {
 
     if (source.toString() == 'legrand') {
-      //product = await getLegrandProductInfo(ref);
       product = await legrand.getProductInfo(ref);
     }
-    /*else if (source.toString() == 'hager') {
-      //product = await getHagerProductInfo(ref);
+    else if (source.toString() == 'hager') {
       product = await hager.getProductInfo(ref);
-    }
+    }/*
     else if (source.toString() == 'jsl') {
       //product = await getJSLProductInfo(ref);
       product = await jsl.getProductInfo(ref);
