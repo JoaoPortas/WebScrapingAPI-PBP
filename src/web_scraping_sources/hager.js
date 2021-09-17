@@ -1,4 +1,4 @@
-const ProductNotFoundError = require('../errors/ProductNotFoundError');
+const ProductNotFoundError = require('../custom_errors/ProductNotFoundError');
 
 const puppeteer = require('puppeteer');
 

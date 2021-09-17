@@ -1,4 +1,4 @@
-const ProductNotFoundError = require('./errors/ProductNotFoundError');
+const ProductNotFoundError = require('./custom_errors/ProductNotFoundError');
 
 const express = require('express');
 const puppeteer = require('puppeteer');
@@ -8,7 +8,7 @@ const port = 9000;
 //Scraping Sources Imports
 const legrand = require('./web_scraping_sources/legrand');
 const hager = require('./web_scraping_sources/hager');
-/*const jsl = require('./web_scraping_sources/jsl');*/
+const jsl = require('./web_scraping_sources/jsl');
 
 app.get('/:source/:ref', async (req, res) => {
   var source = req.params.source;
@@ -22,11 +22,11 @@ app.get('/:source/:ref', async (req, res) => {
     }
     else if (source.toString() == 'hager') {
       product = await hager.getProductInfo(ref);
-    }/*
+    }
     else if (source.toString() == 'jsl') {
       //product = await getJSLProductInfo(ref);
       product = await jsl.getProductInfo(ref);
-    }*/
+    }
     else {
       product = 'error';
     }
@@ -44,7 +44,7 @@ app.get('/:source/:ref', async (req, res) => {
       }
       else if (e instanceof ProductNotFoundError) {
           console.warn('Product not found: The product to search was not found.\n');
-          res.status(404).json({
+          res.status(200).json({
             message: 'Product not found'
           });
       }
