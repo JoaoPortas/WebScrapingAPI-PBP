@@ -1,13 +1,14 @@
 const { CustomError } = require('../custom_errors/CustomError');
 const { errorType } = require('../custom_errors/errorTypes');
+const logger = require('../middleware/logger');
 
 const puppeteer = require('puppeteer');
 
 async function getProductInfo(ref) {
     //const browser = await puppeteer.launch({ headless: false, args: [ "--disable-web-security" ] });
 
-    console.info(`Getting the information for product with the ref. ${ref} in legrand.pt ...`);
-    console.info(`Connecting to legrand.pt ...`);
+    logger.info(`Getting the information for product with the ref. ${ref} in legrand.pt ...`);
+    logger.info(`Connecting to legrand.pt ...`);
 
     const browser = await puppeteer.launch();
 
@@ -17,11 +18,15 @@ async function getProductInfo(ref) {
 
         await page.goto(`https://www.legrand.pt/e-catalogo/catalogsearch/result/?q=${ref}`);
     
-        if ((await page.$('.product-info-main')) == null) throw new CustomError(errorType.PRODUCT_NOT_FOUND);
+        if ((await page.$('.product-info-main')) == null) {
+            logger.warn('Product not found found.');
+            throw new CustomError(errorType.PRODUCT_NOT_FOUND);
+        } 
     
         await page.waitForSelector('.fotorama img');
-    
-        console.info(`Getting product info ...`);
+
+        logger.warn(`Product found!`);
+        logger.info(`Getting product info ...`);
     
         const product = await page.evaluate(() => {    
             let productInfo = document.getElementsByClassName('product-info-main')[0];
@@ -49,14 +54,16 @@ async function getProductInfo(ref) {
             };
         });
 
+        logger.debug(JSON.stringify(product));
+
         return product;
 
     }
     finally {
 
-        console.info(`Closing the browser ...`);
+        logger.info(`Closing the browser ...`);
         await browser.close();
-        console.info(`Search finished`);
+        logger.info(`Search finished`);
 
     }
 }

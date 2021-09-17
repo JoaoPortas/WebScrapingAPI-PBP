@@ -1,12 +1,13 @@
 const { CustomError } = require('../custom_errors/CustomError');
 const { errorType } = require('../custom_errors/errorTypes');
+const logger = require('../middleware/logger');
 
 const puppeteer = require('puppeteer');
 
 async function getProductInfo(ref) {
 
-  console.info(`Getting the information for product with the ref. ${ref} in jsl-online.com ...`);
-  console.info(`Connecting to jsl-online.com ...`);
+  logger.info(`Getting the information for product with the ref. ${ref} in jsl-online.com ...`);
+  logger.info(`Connecting to jsl-online.com ...`);
 
   const browser = await puppeteer.launch();
 
@@ -30,7 +31,7 @@ async function getProductInfo(ref) {
         await page.mouse.click(x, y, { delay: 50 });
       }
 
-      console.info(`Searching in each category ...`);
+      logger.info(`Searching in each category ...`);
 
       const categoriesQtn = await page.evaluate(() => {
         let qtn = (document.getElementsByClassName("dropdown-menu")[0].getElementsByTagName("ul")[0].childElementCount) - 6;
@@ -84,8 +85,8 @@ async function getProductInfo(ref) {
     productFound = await searchJSLProductInCategories(ref);
 
     if (productFound) {
-      console.info('Product found!');
-      console.info(`Getting product info ...`);
+      logger.warn('Product found!');
+      logger.info(`Getting product info ...`);
 
       const product = await page.evaluate(() => {    
         
@@ -106,18 +107,21 @@ async function getProductInfo(ref) {
           };
       });
 
+      logger.debug(JSON.stringify(product));
+
       return product; 
     }
     else {
+      logger.warn('Product not found found.');
       throw new CustomError(errorType.PRODUCT_NOT_FOUND);
     }
 
   }
   finally {
 
-    console.info(`Closing the browser ...`);
+    logger.info(`Closing the browser ...`);
     await browser.close();
-    console.info(`Search finished\n`);
+    logger.info(`Search finished\n`);
 
   }
 }

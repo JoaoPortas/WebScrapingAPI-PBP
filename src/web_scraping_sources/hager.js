@@ -1,12 +1,13 @@
 const { CustomError } = require('../custom_errors/CustomError');
 const { errorType } = require('../custom_errors/errorTypes');
+const logger = require('../middleware/logger');
 
 const puppeteer = require('puppeteer');
 
 async function getProductInfo(ref) {
 
-  console.info(`Getting the information for product with the ref. ${ref} in hager.pt ...`);
-  console.info(`Connecting to hager.pt ...`);
+  logger.info(`Getting the information for product with the ref. ${ref} in hager.pt ...`);
+  logger.info(`Connecting to hager.pt ...`);
 
   const browser = await puppeteer.launch();
 
@@ -14,10 +15,14 @@ async function getProductInfo(ref) {
 
     const page = await browser.newPage();
     await page.goto(`https://www.hager.pt/pesquisar/113907.htm?Suchbegriffe=${ref}&navlang=pt&suchbereich=web&teasersearch=true`);
-    console.log("Thrwo do novo erro");
-    if ((await page.$('.prismaproductdetails')) == null) throw new CustomError(errorType.PRODUCT_NOT_FOUND);
+    if ((await page.$('.prismaproductdetails')) == null) {
+      logger.warn('Product not found found.');
+      throw new CustomError(errorType.PRODUCT_NOT_FOUND);
+    }
 
-    console.info(`Getting product info ...`);
+    logger.warn(`Product found!`);
+
+    logger.info(`Getting product info ...`);
     const product = await page.evaluate(() => {    
         
         let productInfo = document.getElementById("productdetailstable").getElementsByTagName('table')[0].getElementsByTagName('tr');
@@ -41,14 +46,16 @@ async function getProductInfo(ref) {
         };
     });
 
+    logger.debug(JSON.stringify(product));
+
     return product;
 
   }
   finally {
 
-    console.info(`Closing the browser ...`);
+    logger.info(`Closing the browser ...`);
     await browser.close();
-    console.info(`Search finished\n`);
+    logger.info(`Search finished\n`);
 
   }
 }

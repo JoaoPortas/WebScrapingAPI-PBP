@@ -1,10 +1,14 @@
+//Logging
+const logger = require('./middleware/logger');
+const pinoHttp = require('pino-http')({logger: logger});
+
+//Server
 const express = require('express');
-const puppeteer = require('puppeteer');
-const app = express();
 const port = 9000;
 
-//const logger = require('./middleware/logger');
-//const logger = require('pino')();
+const app = express();
+//app.use(pinoHttp);
+
 
 //Scraping Sources Imports
 const legrand = require('./web_scraping_sources/legrand');
@@ -14,6 +18,7 @@ const jsl = require('./web_scraping_sources/jsl');
 //Custom Errors
 const { CustomError } = require('./custom_errors/CustomError');
 const { errorType } = require('./custom_errors/errorTypes');
+const puppeteerErrors = require('puppeteer').errors;
 
 app.get('/:source/:ref', async (req, res) => {
   var source = req.params.source;
@@ -42,21 +47,27 @@ app.get('/:source/:ref', async (req, res) => {
         
   } catch (e) {
       if (e instanceof CustomError) {
-        console.log(JSON.stringify(e));
-        res.status(e.statusCode).json(e);
+        if (e.statusCode == 200) {
+          logger.info(`Error info: \n${JSON.stringify(e)}`);
+          res.status(e.statusCode).json(e);
+        }
+        else {
+          logger.error(`Error info: \n${JSON.stringify(e)}`);
+          res.status(e.statusCode).json(e);
+        }
       }
-      else if (e instanceof puppeteer.errors.TimeoutError) {
-          console.error('Timeout error: The page takes to long to respond.\n');
+      else if (e instanceof puppeteerErrors.TimeoutError) {
+          logger.error('Timeout error: The page takes to long to respond.\n');
           res.status(408).json({
             message: 'Request timeout'
           });
       }
-      /*else if (!e.response) {
+      else if (!e.response) {
           console.error('A problem during the connection was occurred or the URL does not exists.\n');
           res.status(404).json({
             message: 'URL not found or a connection problem was occurred'
           });
-      }*/
+      }
       else {
           console.error('Unknown error:\n' + e.message);
       }
@@ -64,8 +75,7 @@ app.get('/:source/:ref', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Running on port ${port}`);
-    //logger.info("isto é info");
+    logger.info(`Running on port ${port}`);
 });
 
 (async () => {

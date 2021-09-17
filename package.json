@@ -19,6 +19,11 @@
   "dependencies": {
     "axios": "^0.21.3",
     "express": "^4.17.1",
+    "pino": "^6.13.2",
+    "pino-http": "^5.7.0",
     "puppeteer": "^10.2.0"
+  },
+  "devDependencies": {
+    "pino-pretty": "^7.0.1"
   }
 }
