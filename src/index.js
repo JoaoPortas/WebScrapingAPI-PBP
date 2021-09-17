@@ -1,14 +1,19 @@
-const ProductNotFoundError = require('./custom_errors/ProductNotFoundError');
-
 const express = require('express');
 const puppeteer = require('puppeteer');
 const app = express();
 const port = 9000;
 
+//const logger = require('./middleware/logger');
+//const logger = require('pino')();
+
 //Scraping Sources Imports
 const legrand = require('./web_scraping_sources/legrand');
 const hager = require('./web_scraping_sources/hager');
 const jsl = require('./web_scraping_sources/jsl');
+
+//Custom Errors
+const { CustomError } = require('./custom_errors/CustomError');
+const { errorType } = require('./custom_errors/errorTypes');
 
 app.get('/:source/:ref', async (req, res) => {
   var source = req.params.source;
@@ -36,24 +41,22 @@ app.get('/:source/:ref', async (req, res) => {
     res.status(200).json(product);
         
   } catch (e) {
-      if (e instanceof puppeteer.errors.TimeoutError) {
+      if (e instanceof CustomError) {
+        console.log(JSON.stringify(e));
+        res.status(e.statusCode).json(e);
+      }
+      else if (e instanceof puppeteer.errors.TimeoutError) {
           console.error('Timeout error: The page takes to long to respond.\n');
           res.status(408).json({
             message: 'Request timeout'
           });
       }
-      else if (e instanceof ProductNotFoundError) {
-          console.warn('Product not found: The product to search was not found.\n');
-          res.status(200).json({
-            message: 'Product not found'
-          });
-      }
-      else if (!e.response) {
+      /*else if (!e.response) {
           console.error('A problem during the connection was occurred or the URL does not exists.\n');
           res.status(404).json({
             message: 'URL not found or a connection problem was occurred'
           });
-      }
+      }*/
       else {
           console.error('Unknown error:\n' + e.message);
       }
@@ -62,10 +65,17 @@ app.get('/:source/:ref', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Running on port ${port}`);
+    //logger.info("isto é info");
 });
 
 (async () => {
-
+  /*try {
+    throw new CustomError(errorType.PRODUCT_NOT_FOUND);
+  } catch (error) {
+    //console.log(`${error.message} - ${error.errorCode}`);
+    console.log(JSON.stringify(error));
+    
+  }*/
 })();
 
 /*const getJSLProductInfo = async (ref) => {

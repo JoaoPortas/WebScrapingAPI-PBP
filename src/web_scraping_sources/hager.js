@@ -1,4 +1,5 @@
-const ProductNotFoundError = require('../custom_errors/ProductNotFoundError');
+const { CustomError } = require('../custom_errors/CustomError');
+const { errorType } = require('../custom_errors/errorTypes');
 
 const puppeteer = require('puppeteer');
 
@@ -13,8 +14,8 @@ async function getProductInfo(ref) {
 
     const page = await browser.newPage();
     await page.goto(`https://www.hager.pt/pesquisar/113907.htm?Suchbegriffe=${ref}&navlang=pt&suchbereich=web&teasersearch=true`);
-
-    if ((await page.$('.prismaproductdetails')) == null) throw new ProductNotFoundError();
+    console.log("Thrwo do novo erro");
+    if ((await page.$('.prismaproductdetails')) == null) throw new CustomError(errorType.PRODUCT_NOT_FOUND);
 
     console.info(`Getting product info ...`);
     const product = await page.evaluate(() => {    

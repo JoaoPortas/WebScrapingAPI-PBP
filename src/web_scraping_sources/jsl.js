@@ -1,4 +1,5 @@
-const ProductNotFoundError = require('../custom_errors/ProductNotFoundError');
+const { CustomError } = require('../custom_errors/CustomError');
+const { errorType } = require('../custom_errors/errorTypes');
 
 const puppeteer = require('puppeteer');
 
@@ -108,7 +109,7 @@ async function getProductInfo(ref) {
       return product; 
     }
     else {
-      throw new ProductNotFoundError();
+      throw new CustomError(errorType.PRODUCT_NOT_FOUND);
     }
 
   }

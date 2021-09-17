@@ -1,4 +1,5 @@
-const ProductNotFoundError = require('../custom_errors/ProductNotFoundError');
+const { CustomError } = require('../custom_errors/CustomError');
+const { errorType } = require('../custom_errors/errorTypes');
 
 const puppeteer = require('puppeteer');
 
@@ -16,7 +17,7 @@ async function getProductInfo(ref) {
 
         await page.goto(`https://www.legrand.pt/e-catalogo/catalogsearch/result/?q=${ref}`);
     
-        if ((await page.$('.product-info-main')) == null) throw new ProductNotFoundError();
+        if ((await page.$('.product-info-main')) == null) throw new CustomError(errorType.PRODUCT_NOT_FOUND);
     
         await page.waitForSelector('.fotorama img');
     
